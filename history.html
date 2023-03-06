@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Book-Store</title>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="shortcut icon" href="Capture.PNG" type="image/x-icon" />
+  </head>
+  <body>
+    <div class="header">
+      <div class="header1">
+        <div class="logo">
+          <img src="Capture.PNG" alt="" width="70" />
+          <span>BOOK STORE APP</span>
+        </div>
+
+        <div class="content">
+          <h3>Your Previous Searches------</h3>
+          <button id="clear">Clear Search</button>
+        </div>
+      </div>
+    </div>
+    <div class="history">
+      <table id="item-list">
+        <thead>
+          <tr>
+            <th id="Name">Author and the Book Name</th>
+            <th id="time">Your searching Time</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+    <div class="books-container" id="Again"></div>
+
+
+
+
+
+    <script>
+      let tbody1 = document.querySelector("tbody");
+
+      let data = JSON.parse(localStorage.getItem("books"));
+      let value;
+      if (data != null) {
+        console.log("hello");
+        data.forEach((element) => {
+          let row = document.createElement("tr");
+          row.addEventListener("click", viewAgain);
+          if(row.click ){
+            value = element;
+          }
+          console.log("hello");
+
+          let listitem1 = document.createElement("td");
+          listitem1.textContent = element;
+          listitem1.classList.add("Name");
+          row.append(listitem1);
+          let date1 = new Date();
+          let date = date1.getDate();
+          let month = date1.getMonth();
+          let hr = date1.getHours();
+          let min = date1.getMinutes();
+          let sec = date1.getSeconds();
+          let listitem2 = document.createElement("td");
+          listitem2.innerHTML = `Search On ${date}/${month}/2023 at ${hr}:${min}:${sec} `;
+          listitem2.classList.add("time");
+
+          row.append(listitem2);
+          tbody1.append(row);
+        });
+      } else {
+        let p = document.createElement("p");
+        p.innerText = "Your search History is empty..................";
+        p.style.fontSize = "30px";
+        p.style.padding = "20px";
+        tbody1.append(p);
+      }
+
+      let clear_history = document.getElementById("clear");
+      clear_history.addEventListener("click", clearData);
+
+      function clearData() {
+        console.log("hello");
+        localStorage.clear();
+      }
+
+      async function viewAgain() {
+        console.log("hiiii");
+        const response = await fetch(
+          "https://www.googleapis.com/books/v1/volumes?q=percy+jackson"
+        );
+        const data1 = await response.json();
+        let items = data1.items;
+        items.forEach((item) => {
+          if (
+            value === item.volumeInfo.title ||
+            value === item.volumeInfo.authors[0]
+          ) {
+            let container = document.getElementById("Again");
+            container.innerHTML += `
+        <div class="card">
+            <img class="image-top" src=${item.volumeInfo.imageLinks.thumbnail} alt="${item.volumeInfo.title}">
+            <div class="card-body">
+                <h5 class="card-title">${item.volumeInfo.title}</h5>
+                <p class="card-authorName">Author's Name: ${item.volumeInfo.authors[0]}</p>
+                <p class="card-text">${item.volumeInfo.publisher}</p>
+                <p class="card-rating">Ratings: ${item.volumeInfo.averageRating} &#9733;</p>
+            <div>
+        </div>`;
+          }
+        });
+      }
+    </script>
+  </body>
+</html>
